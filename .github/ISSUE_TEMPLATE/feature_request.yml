@@ -1,0 +1,11 @@
+name: 功能建议
+description: 说明希望改善的场景
+title: "[Feature] "
+labels: [enhancement]
+body:
+  - type: textarea
+    id: proposal
+    attributes:
+      label: 使用场景、遇到的问题和期望的改进
+    validations:
+      required: true

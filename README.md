@@ -67,3 +67,7 @@ node scripts/build-installer.cjs   # 生成安装包，需要 NSIS 的 makensis.
 ## 许可证
 
 [MIT](LICENSE)，作者 **Velpro**。允许商用、修改与分发，须保留版权声明与许可证全文。随包的 `desktop-layer.exe` 为桌面贴纸辅助程序，仅以二进制形式分发；其余第三方组件遵循各自许可证。
+
+## 参与与维护
+
+反馈问题或贡献代码请阅读 [贡献指南](CONTRIBUTING.md)；版本、测试与发布约定见 [维护说明](MAINTAINING.md)，安全问题请参阅 [安全报告方式](SECURITY.md)。

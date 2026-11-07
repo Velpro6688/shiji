@@ -1,0 +1,18 @@
+name: 问题反馈
+description: 报告可复现的问题
+title: "[Bug] "
+labels: [bug]
+body:
+  - type: input
+    id: environment
+    attributes:
+      label: 应用版本与操作系统
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: 复现步骤、预期行为与实际结果
+      description: 请使用虚构数据，截图与日志先脱敏。
+    validations:
+      required: true
