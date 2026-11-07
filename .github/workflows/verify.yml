@@ -23,7 +23,15 @@ jobs:
       - run: npm run dist
       - run: node scripts/verify/verify-packed-resources.cjs
       - run: npm run verify:packed-ui
-      - run: node scripts/build-installer.cjs
+      - name: Install NSIS compiler
+        shell: pwsh
+        run: |
+          choco install nsis --yes --no-progress
+          if ($LASTEXITCODE -ne 0) { throw 'NSIS installation failed' }
+      - name: Build installer
+        run: node scripts/build-installer.cjs
+        env:
+          NSIS_EXE: C:\Program Files (x86)\NSIS\makensis.exe
       - uses: actions/upload-artifact@v4
         if: always()
         with:
