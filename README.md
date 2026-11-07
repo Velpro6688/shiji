@@ -48,7 +48,7 @@ node scripts/build-installer.cjs   # 生成安装包，需要 NSIS 的 makensis.
 
 ## 数据位置
 
-默认存档在 `%APPDATA%\habit-lab\`（`data.json`、`images\`、`auto-backup\`）。便携模式下数据改存到程序旁的 `data\` 目录。安装、升级、卸载都不会删除这些数据；迁移或重装前建议先在应用内导出备份。
+默认存档在 `%APPDATA%\habit-lab\`（`data.json`、`images\`、`auto-backup\`）。便携模式下数据改存到程序旁的 `data\` 目录。安装和升级会保留存档；卸载默认保留数据，但选择删除数据时会移除默认存档。迁移、升级或卸载前建议先导出备份。
 
 ## 许可证
 

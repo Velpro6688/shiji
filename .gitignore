@@ -23,3 +23,11 @@ artifacts/
 .finesse/
 .zcodeignore
 /AGENTS.md
+
+# Test profiles and results contain local data
+scripts/verify/profiles/
+scripts/verify/results/
+scripts/verify/_archive/
+
+/scripts/verify/audit-next-review.cjs
+/scripts/verify/audit-v267.cjs

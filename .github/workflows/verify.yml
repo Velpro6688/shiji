@@ -1,0 +1,31 @@
+name: Windows verification
+on: [push, pull_request, workflow_dispatch]
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: windows-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - run: npm run electron:install
+      - run: npm run check
+      - run: npm run lint -- --max-warnings=0
+      - run: npm run verify:all
+      - run: npm run verify:onboarding
+      - run: npm run verify:corners
+      - run: npm run verify:v313
+      - run: npm run dist
+      - run: node scripts/verify/verify-packed-resources.cjs
+      - run: npm run verify:packed-ui
+      - run: node scripts/build-installer.cjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: verification-results
+          path: scripts/verify/results/
