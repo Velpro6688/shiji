@@ -1,0 +1,136 @@
+/* ============ 待办事项（3.1.0） ============
+   待办页 + 编辑抽屉 + 贴纸待办卡。
+   颜色/圆角/间距一律走 tokens.css 的 --ui-* 语义变量（换肤与深色自动生效）；
+   优先级中档沿用系统 --gold（无对应 --ui token，带浅色回退值）。
+   贴纸形态显示规则仿 .m-sticky-today（app.css 3031 段）。
+
+   ───── 待办页 ───── */
+.todo-page{padding-bottom:110px;}
+.todo-page-heading{margin:8px 0 16px;}
+.todo-page-heading h2{margin:0;color:var(--ui-text);font-size:20px;line-height:1.4;font-weight:650;}
+.todo-add-wrap{display:flex;gap:8px;align-items:center;margin:0 0 24px;}
+.todo-add-wrap input{flex:1;min-width:0;padding:12px 14px;border:1px solid var(--ui-border);border-radius:var(--ui-radius-sm);font-size:15px;background:var(--ui-surface);color:var(--ui-text);font-family:inherit;}
+.todo-add-wrap input::placeholder{color:var(--ui-text-tertiary);}
+.todo-add-wrap input:focus{outline:none;border-color:var(--ui-accent);}
+.todo-add-btn{flex:none;gap:6px;min-width:44px;padding:0 14px;font-family:inherit;font-weight:600;font-size:13px;height:44px;border:none;border-radius:var(--ui-radius-md);background:var(--ui-accent);color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:transform var(--ui-motion-fast) ease,opacity var(--ui-motion-fast) ease;}
+.todo-add-btn:active{transform:scale(.94);}
+.td-group-title{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:600;letter-spacing:0;color:var(--ui-text-secondary);margin:24px 0 12px;}
+.td-group-title b{font-size:11px;color:var(--ui-text-tertiary);font-weight:700;}
+.td-done-title{cursor:pointer;user-select:none;}
+.td-done-title.fold b::after{content:' ▸';}
+.td-done-title:not(.fold) b::after{content:' ▾';}
+.td-clear{margin-left:auto;border:none;background:transparent;color:var(--ui-danger);font-size:12px;font-weight:700;cursor:pointer;padding:6px 8px;border-radius:8px;}
+.td-clear:active{background:var(--ui-danger-soft,rgba(189,36,36,.08));}
+
+/* 行卡片：左侧优先级色条 + 勾选钮 + 内容 + 徽章 + 置顶 */
+.td-item{position:relative;display:flex;align-items:flex-start;gap:12px;padding:16px;border-radius:var(--ui-radius-md);background:var(--ui-surface);border:1px solid var(--ui-border);box-shadow:none;margin-bottom:8px;overflow:hidden;transition:background var(--ui-motion-fast) ease;}
+.td-item:hover{background:var(--ui-surface-raised);}   /* 悬停反馈：提示整行可交互（原缺失，UIUX 走查发现） */
+.td-item:focus-visible{outline:2px solid var(--ui-accent);outline-offset:2px;}
+.td-check:focus-visible,.td-pin:focus-visible,.td-clear:focus-visible,.td-done-title:focus-visible{outline:2px solid var(--ui-accent);outline-offset:2px;}
+.td-pri{position:absolute;left:0;top:0;bottom:0;width:2px;background:transparent;}
+.td-item.p-high .td-pri{background:var(--ui-danger);}
+.td-item.p-mid .td-pri{background:var(--gold,#FF9500);}
+.td-item.p-low .td-pri{background:var(--ui-accent);}
+.td-check{flex:none;width:22px;height:22px;margin-top:2px;border:2px solid var(--ui-border);border-radius:50%;background:transparent;color:transparent;font-size:13px;font-weight:800;line-height:1;display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0;transition:background var(--ui-motion-fast) ease,border-color var(--ui-motion-fast) ease,color var(--ui-motion-fast) ease,transform var(--ui-motion-fast) ease;}
+.td-check:hover{border-color:var(--ui-accent);}
+.td-check:active{transform:scale(.88);}
+.td-check[aria-pressed="true"]{background:var(--ui-accent);border-color:var(--ui-accent);color:#fff;}
+.td-main{flex:1;min-width:0;cursor:pointer;}
+.td-main:focus-visible{outline:2px solid var(--ui-accent);outline-offset:4px;border-radius:4px}
+@media(any-pointer:coarse){
+  .td-check,.td-pin{min-width:44px;min-height:44px}
+  .td-main{min-height:44px}
+  .td-clear{min-height:44px}
+}
+.td-text{font-size:15px;font-weight:500;color:var(--ui-text);word-break:break-word;line-height:1.45;}
+.td-item.done .td-text{color:var(--ui-text-tertiary);text-decoration:line-through;}
+.td-note{font-size:12px;color:var(--ui-text-secondary);margin-top:4px;word-break:break-word;line-height:1.4;}
+.td-due{flex:none;font-size:12px;font-weight:500;color:var(--ui-text-secondary);background:var(--ui-surface-raised);border-radius:7px;padding:4px 8px;margin-top:3px;white-space:nowrap;}
+.td-due.overdue{color:#fff;background:var(--ui-danger);}
+.td-due.is-today{color:var(--ui-accent-strong);background:var(--ui-accent-soft);}
+.td-sub{flex:none;display:inline-flex;align-items:center;gap:3px;font-size:11px;font-weight:700;color:var(--ui-text-secondary);background:var(--ui-surface-raised);border-radius:7px;padding:4px 7px;margin-top:3px;white-space:nowrap;}
+.td-sub.all{color:var(--ui-positive);}
+.td-pin{flex:none;min-width:28px;min-height:28px;border:none;background:transparent;color:var(--ui-text-tertiary);cursor:pointer;padding:4px;border-radius:8px;opacity:.55;transition:opacity var(--ui-motion-fast) ease,color var(--ui-motion-fast) ease,background var(--ui-motion-fast) ease;}
+.td-pin:hover{opacity:1;color:var(--ui-accent);background:var(--ui-accent-soft);}
+.td-item.pinned .td-pin{opacity:1;color:var(--ui-accent);}
+.td-meta{display:flex;flex-wrap:wrap;gap:8px;align-items:center;flex:none}
+@media(max-width:420px){
+  #page-todo .td-item{display:grid;grid-template-columns:24px minmax(0,1fr) 24px;gap:8px 12px}
+  #page-todo .td-check{grid-column:1;grid-row:1}
+  #page-todo .td-main{grid-column:2;grid-row:1}
+  #page-todo .td-pin{grid-column:3;grid-row:1}
+  #page-todo .td-meta{grid-column:2/-1;grid-row:2}
+}
+.td-empty{padding:44px 0 36px;text-align:center;font-size:13px;color:var(--ui-text-tertiary);}
+.td-empty .td-empty-ic{margin:0 auto 10px;width:44px;height:44px;border-radius:50%;background:var(--ui-surface-raised);color:var(--ui-text-tertiary);display:flex;align-items:center;justify-content:center;}
+.td-empty-btn{margin-top:14px;border:none;background:var(--ui-accent-soft);color:var(--ui-accent-strong);font-size:13px;font-weight:500;cursor:pointer;padding:12px 20px;border-radius:8px;font-family:inherit;transition:opacity var(--ui-motion-fast) ease,transform var(--ui-motion-fast) ease;}
+.td-empty-btn:active{transform:scale(.96);}
+html.dark .td-empty-btn{color:var(--brand-light,#8DBFFF);}
+.td-none{padding:10px 2px;font-size:12px;color:var(--ui-text-tertiary);}
+
+/* ───── 编辑抽屉（#todoEditSheet，.sheet 通用骨架在 app.css） ───── */
+/* app.css 的 .field 只覆盖 input/select，textarea 在此补齐同款外观 */
+#todoEditSheet .field textarea{width:100%;padding:12px 14px;border:2px solid var(--ui-border);border-radius:var(--ui-radius-md);font-size:14px;background:var(--ui-surface);color:var(--ui-text);font-family:inherit;line-height:1.5;resize:vertical;min-height:56px;}
+#todoEditSheet .field textarea:focus{outline:none;border-color:var(--ui-accent);}
+.todo-pri-seg{display:flex;gap:6px;}
+.todo-pri-seg button{flex:1;padding:10px 0;border:2px solid var(--ui-border);border-radius:var(--ui-radius-sm);background:var(--ui-surface);color:var(--ui-text-secondary);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;transition:background var(--ui-motion-fast) ease,border-color var(--ui-motion-fast) ease,color var(--ui-motion-fast) ease;}
+.todo-pri-seg button.on{border-color:var(--ui-accent);color:var(--ui-accent-strong);background:var(--ui-accent-soft);}
+.todo-sub-list{display:flex;flex-direction:column;gap:8px;margin-bottom:8px;}
+.todo-sub-row{display:flex;align-items:center;gap:8px;}
+.todo-sub-check{flex:none;width:20px;height:20px;border:2px solid var(--ui-border);border-radius:50%;background:transparent;color:transparent;font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0;}
+.todo-sub-check.on{background:var(--ui-accent);border-color:var(--ui-accent);color:#fff;}
+.todo-sub-row input{flex:1;min-width:0;padding:9px 12px;border:2px solid var(--ui-border);border-radius:var(--ui-radius-sm);font-size:14px;background:var(--ui-surface);color:var(--ui-text);font-family:inherit;}
+.todo-sub-row input:focus{outline:none;border-color:var(--ui-accent);}
+.todo-sub-del{flex:none;width:28px;height:28px;border:none;background:transparent;color:var(--ui-text-tertiary);font-size:18px;cursor:pointer;border-radius:8px;}
+.todo-sub-add{border:none;background:transparent;color:var(--ui-accent);font-size:13px;font-weight:700;cursor:pointer;padding:8px 4px;font-family:inherit;}
+
+/* ───── 贴纸待办卡（hb_lock_mode='todo'） ─────
+   默认隐藏；待办形态在锁定/贴纸窗展开为唯一内容（仿 .m-sticky-today 规则）。 */
+body.m-sticky-today .sticky-todo,
+body:not(.m-sticky-todo) .sticky-todo{display:none!important;}
+body.m-sticky-todo.app-locked .sticky-todo,
+body.m-sticky-todo.sticky-sticker .sticky-todo{display:flex!important;flex-direction:column;flex:1;min-height:0;overflow-y:auto;overflow-x:hidden;}
+body.m-sticky-todo.app-locked .sticky-today,
+body.m-sticky-todo.sticky-sticker .sticky-today{display:none!important;}
+body.m-sticky-todo.app-locked .memo-box,
+body.m-sticky-todo.sticky-sticker .memo-box{display:none!important;}
+body.m-sticky-todo.app-locked .me-top,
+body.m-sticky-todo.sticky-sticker .me-top{display:none!important;}
+
+.st-todo{display:flex;flex-direction:column;gap:10px;width:100%;padding:4px 2px 2px;}
+.st-todo .st-head{display:flex;align-items:center;gap:14px;padding:0 2px;}
+.st-todo .st-ring{position:relative;width:74px;height:74px;flex:none;display:flex;align-items:center;justify-content:center;flex-direction:column;border-radius:50%;background:conic-gradient(var(--ui-accent) 0 100%,var(--tile-3,#E5E5EA) 0);}
+.st-todo .ring-num{font-size:15px;font-weight:800;color:var(--ui-text);}
+.st-todo .ring-sub{font-size:9px;font-weight:700;color:var(--ui-text-secondary);letter-spacing:.3px;}
+.st-todo .st-title{font-size:16px;font-weight:800;color:var(--ui-text);line-height:1.3;}
+.st-todo .st-date{font-size:11px;font-weight:600;color:var(--ui-text-secondary);margin-top:2px;}
+.st-td-overdue{color:var(--ui-danger);font-weight:800;}
+.st-td-list{display:flex;flex-direction:column;gap:6px;}
+.st-td-item{display:flex;align-items:flex-start;gap:8px;padding:8px 10px;border-radius:var(--ui-radius-sm);background:var(--ui-surface-raised);}
+.st-td-item.overdue{box-shadow:inset 3px 0 0 var(--ui-danger);}
+.st-td-item .td-check{width:18px;height:18px;font-size:11px;}
+.st-td-item .td-main{cursor:pointer;}
+.st-td-item .td-text{font-size:13px;}
+.st-td-item .td-sub{margin-top:1px;font-size:10px;padding:2px 6px;}
+.st-td-item .td-due{font-size:10px;padding:2px 6px;margin-top:1px;}
+.st-td-more{font-size:11px;color:var(--ui-text-tertiary);text-align:center;padding:2px 0;}
+.st-td-open{border:none;background:var(--ui-accent-soft);color:var(--ui-accent-strong);font-size:12px;font-weight:800;cursor:pointer;padding:10px;border-radius:var(--ui-radius-sm);font-family:inherit;}
+.st-td-open:active{opacity:.8;}
+
+/* ───── 统计概览：待办格（与 .stat-mini.a/.g/.s/.r 同族，app.css 738 段） ───── */
+.stat-mini.t .sm-ico{color:var(--sky,#32ADE6);}
+.stat-mini.t b{color:var(--sky,#32ADE6);}
+
+/* ───── tabbar 5 项窄窗适配：5 项时收紧字号与图标，避免挤压出省略号 ───── */
+@media (max-width:420px){
+  .tabbar .tab .ti svg{width:21px;height:21px;}
+  .tabbar .tab .tl{font-size:12px;letter-spacing:0;}
+}
+
+
+html.dark .td-due.overdue{color:var(--ui-danger);background:rgba(255,147,142,.16);}
+html.dark .td-due.is-today{color:var(--brand-light,#8DBFFF);background:rgba(77,163,255,.14);}
+html.dark .st-td-open{color:var(--brand-light,#8DBFFF);}
+html.dark .todo-pri-seg button.on{color:var(--brand-light,#8DBFFF);}
+html.dark .td-item.p-mid .td-pri{background:var(--warn,#FFCC66);}
+html.dark .td-item.p-low .td-pri{background:var(--brand-light,#8DBFFF);}

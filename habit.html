@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<!--
+   时迹 v18 · 治愈系波点 · 手机/桌面双端稳定适配 · 本机存储 + 自动备份 · 零依赖 · 全手绘 SVG 图表
+   四个 tab：今日打卡 / 数据统计 / 便签 / 我的；习惯的新建与管理从今日页「＋」「管理」进入
+   v8 布局修复：scrollbar-gutter:stable 消除切 tab 宽度抖动；桌面居中「手机外壳」固定宽度不随窗口变化
+   v9 新增：
+     1) 头像支持上传图片(自动压缩为256方图存base64) / 输入任意 emoji-文字 / 预设三选一
+     2) 「我的习惯」添加按钮改为焦糖橙渐变醒目大按钮
+     3) 打卡新增「时间段」类型：填几点睡几点起，自动算时长(支持跨天)并打卡
+     4) 「今日」打卡组件可切长方形(整行)/正方形(一行两个)，避免过长
+     5) 热力图改列式 flex 布局修复横滑错位，左列 sticky 遮挡，顶部标注日期
+     6) 主题外观可自定义：多种背景 + 波点/纯色底 + 多种胶囊按钮强调色，动态改 :root 变量换肤
+     7) 移除底部版本号文字
+   v10 修复/新增：
+     A) 修复桌面端主题弹层撑满全屏 → 弹层与遮罩挂在 #app 外，桌面端限宽 430/440 并居中
+     B) 换新一批更清新的浅色系主题(燕麦拿铁/抹茶/晴空蓝/香芋紫/蜜桃/奶油沙)与强调色
+     C) 主题色块尺寸收窄(aspect-ratio 1.5)更精致
+     D) 背景色 & 强调色均支持「取色板选色 + 输入 #HEX 色号」自定义(bg/accent='custom'，自动派生深浅层次与文字对比)
+   v11 新增：
+     E) 文字颜色随背景明暗自适配 —— 新增 --on-bg/--on-bg-2/--on-bg-3/--on-bg-fill 语义变量，
+        applyTheme 按背景亮度(isDark)动态赋值：深底→浅字、浅底→深字；
+        覆盖 顶栏/用户名/连续天数/「今天还差什么」等标题/进度环大卡文字+进度弧轨道/rtag/底部导航栏(玻璃底+文字)，
+        预设浅色主题与自定义浅色背景均不再出现白字压浅底看不清的问题
+   v12 新增：
+     F) 「已完成」按钮文字/勾号随按钮底色亮度自适配(isDarkHex 决定白字或深字)，柔和浅色按钮不再白字糊
+     G) 顶部「最长连续」徽章数字/边框改用 --on-bg 系变量，随主题明暗适配
+     H) 底部导航栏改为手绘矢量 SVG 图标(房子/日历打勾/柱状图/用户)，stroke:currentColor 跟随选中态与主题色
+     I) 重构默认色系为低饱和莫兰迪治愈系：背景 晨雾灰蓝/鼠尾草绿/陶土杏/薰衣草雾/干枯玫瑰/燕麦奶油，
+        强调与习惯默认色同步更新为呼应色；旧主题 id 平滑迁移到新配色
+   v13 全矢量图标化：
+     J) 新建内联 SVG 图标库 ICN_P(33+ 图标, 24 viewBox)+icn(name,size,sw) helper，stroke:currentColor 跟随主题与父色
+     K) 界面全部装饰性图标由 emoji 换成手绘矢量 SVG —— 各 section 标题(📌📊🔥🎨🌱🏆⚙️💾📲等)、
+        「我的」设置项(🎨🔔🔊📤📥🧹)、成就徽章(9枚)、统计卡(🔥📅✅🎨)、连续火苗、周历打勾、编辑按钮、
+        头像上传按钮(📷→相机)、习惯编辑器打卡类型选择(✓#⏱🌙→勾/井号/时钟/月亮)
+     L) 保留用户可自定义图标不动：习惯 icon / 头像 avatar / 心情 emoji / ICONS·AVATARS 预设选项；
+        句末语气 emoji(🎉🌿✨等文案氛围)与庆祝弹屑动画保留，仅替换功能性/装饰性「图标」
+   v14 方块底色跟随主题：
+     M) 新增 --tile/--tile-2/--tile-3 语义变量，applyTheme 中由「卡片色 mix 强调色」派生(mixHex/parseRGB 新工具)，
+        让内嵌方块带上背景+按钮主题倾向，不再是死板中性米色
+     N) 覆盖 今日页 +/- 按钮(.sbtn)、count 杯格(.cup)、bool 大按钮(.big-btn)、时间段起止框(.range-box)、
+        心情选择块(.mood-pick,tile-2)、热力图空格；习惯页 统计块(.hstat-box)、周历方格(.wd .dot)、编辑按钮(.habit-edit-btn)
+     O) 保留交互态/结构装饰(滚动条/toggle/sheet拖条/menu按压)为原 cream-d，避免过度上色
+   v15 渐变大卡文字修复：
+     P) 新增 --on-grad/--on-grad-2/--on-grad-3/--on-grad-fill 语义变量，按【渐变平均色明暗】单独判定，
+        修复整体背景判深但渐变本身偏浅(如鼠尾草绿)时，「我的」头卡副标题/统计标签浅字压浅底看不清的问题
+     Q) 「我的」头卡(.profile 名字/副标题/统计数字标签/头像描边/波点)、今日进度环大卡(.ring-card 文字/进度弧/装饰/rtag)
+        统一改用 --on-grad 系变量，随渐变明暗自适配(浅渐变→深字、深渐变→浅字)
+   v16：成就徽章图标由矢量 SVG 换回 emoji（🌱🔥💎👑⭐🎨🏅🏆🌈），更生动；.badge .bi 改 font-size:30px 去 color
+   v17) 全 app 中性方块底色彻底统一随主题：习惯 icon 底块 .hi 由习惯色半透明改为 --tile；
+        设置面板方块(上传/管理编辑按钮/菜单按压/开关关闭态/sheet拖条/滚动条)统一 tile/tile-3；
+        仅进度/语义色方块(已完成按钮/count杯格/+1/心情选中/周历已打卡/热力图已打卡/取色板)保留习惯自身色
+   v18) 修复"变量已接入但底色肉眼仍没变"：旧算法只用固定奶油色+20%强调，未使用背景色且只改了内嵌小块；
+        新增 bgHex/themeCore，先融合背景38%+强调62%；再派生 surfaceBase 覆盖全 app 主卡片/模块(--cream)，
+        同时由 surface+themeCore 强化派生 tile/tile-2/tile-3，主模块与内部方块均会明显随背景和按钮主题变化
+   数据 key 沿用 wb_workspace_habit_v1，兼容历史数据
+-->
+<html lang="zh-CN">
+<head>
+<!-- The original hosted build injected /page/page_comm/inject.js here.  The
+     desktop build is deliberately self-contained, so do not request a
+     non-existent absolute URL when the page is loaded from file://. -->
+<meta charset="UTF-8">
+<!-- P3 CSP：禁远程脚本/对象/表单；script/style 保留 unsafe-inline（页面存在大量
+     onclick 内联处理器与 element.style 写入）；img-src 放行 https:（便签可粘贴外链图，
+     与 sanitize 白名单口径一致）；frame-ancestors 在 meta 中无效，由 main.js 导航守卫兜底。 -->
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' hbimg: data: https:; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover" name="viewport">
+<meta content="yes" name="apple-mobile-web-app-capable">
+<meta content="black-translucent" name="apple-mobile-web-app-status-bar-style">
+<meta content="时迹" name="apple-mobile-web-app-title">
+<meta content="#F5F5F7" name="theme-color">
+<title data-pnid-children="CJkSeIUgaagcv4xZrUxgfD">时迹</title>
+<link rel="stylesheet" href="styles/app.css">
+<link rel="stylesheet" href="styles/tokens.css">
+<link rel="stylesheet" href="styles/components.css">
+<link rel="stylesheet" href="styles/layout.css">
+<link rel="stylesheet" href="styles/planning.css">
+<link rel="stylesheet" href="styles/todo.css">
+</head>
+<body><script src="js/editor-marker.js"></script>
+<div id="app">
+  <!-- 自定义奖励弹窗：领取→倒计时→完成庆祝 -->
+  <div id="rewardMask" class="reward-mask" role="dialog" aria-modal="true" aria-labelledby="rwTitle" hidden>
+    <div class="reward-card">
+      <div class="rw-t" id="rwTitle"></div>
+      <div class="rw-d" id="rwDesc"></div>
+      <div class="rw-timer" id="rwTimer"></div>
+      <div class="rw-bar"><i id="rwBar"></i></div>
+      <div class="rw-btns"><button class="rw-start" id="rwStart"></button><button class="rw-later" id="rwLater"></button></div>
+      <div class="rw-btns rw-run" id="rwRun" hidden><button class="rw-bg" id="rwBg"></button><button class="rw-exit" id="rwExit"></button></div>
+    </div>
+  </div>
+  <!-- 进行中的奖励秒表：必须脱离 .page（非活动页 display:none、锁定态整片隐藏），否则换页就找不到正在跑的奖励 -->
+  <span id="rwPill" class="rw-pill" hidden></span>
+
+  <div class="window-drag-handle" aria-hidden="true"></div>
+  <!-- 自绘窗口控制条（锁定 / 最小化到任务栏 / 关闭到托盘） -->
+
+  <button class="win-fab" data-act="lock" onclick="handleWindowAction('lock',event)" title="解锁" aria-label="解锁">
+    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 7-2.6"/></svg>
+  </button>
+  <!-- 贴纸形态切换：浮在 win-fab 旁（便签 ↔ 今日进度 ↔ 待办卡），贴纸态可见，编辑态隐藏 -->
+  <button id="wfMode" class="win-fab wf-mode" onclick="toggleStickyMode()" title="切换贴纸形态" aria-label="切换形态">
+    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6h13M8 12h13M8 18h13"/><path d="M3 6l1 1 2-2M3 12l1 1 2-2M3 18l1 1 2-2"/></svg>
+  </button>
+
+  <!-- 顶栏 -->
+  <div class="topbar">
+    <div class="header-main">
+      <div class="header-brand" aria-label="时迹"><img src="logo-32.png" alt=""><span>时迹</span></div>
+      <button type="button" class="header-avatar" id="tbAva" onclick="go('mine')" aria-label="个人资料">☕</button>
+      <div class="tb-txt" hidden><div id="tbHi"></div><div id="tbName"></div><div id="tbDate"></div></div>
+      <div class="header-streak" title="每日计划的最长连续记录"><span data-i18n="best_streak">最长连续</span><b id="tbStreak">0</b><span data-i18n="unit_day">天</span></div>
+      <div class="header-actions">
+    <button id="appSaveStatus" class="save-state" type="button" role="status" aria-live="polite" onclick="flushRendererChanges().catch(function(){})" data-state="saved" title="保存状态">已保存</button>
+  <div class="win-bar" role="toolbar" aria-label="窗口控制">
+    <button type="button" id="pinTodayDesktop" class="desktop-pin" onclick="pinTodayToDesktop()" title="贴出上次使用的便签；没有便签时显示今日进度" aria-label="贴出上次使用的便签"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="10" r="3.2"/><path d="M12 21c4.5-4.2 7-7.5 7-11a7 7 0 1 0-14 0c0 3.5 2.5 6.8 7 11z"/></svg> <span>贴便签</span></button>
+    <button class="wb-btn" data-act="minimize" onclick="handleWindowAction('minimize',event)" title="最小化到任务栏" aria-label="最小化到任务栏">
+      <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 14h14"/></svg>
+    </button>
+    <button class="wb-btn wb-close" data-act="close" onclick="handleWindowAction('close',event)" title="关闭窗口（保留托盘）" aria-label="关闭窗口（保留托盘）">
+      <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6 6 18"/></svg>
+    </button>
+  </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="scroll" id="scroll">
+
+    <!-- ========== 今日 ========== -->
+    <div class="page active" id="page-today">
+      <div class="date-nav" aria-label="日期切换"><button type="button" onclick="shiftViewDate(-1)" title="前一天">‹</button><strong id="viewDateLabel"></strong><button type="button" id="btnBackToday" onclick="resetViewDate()" title="回到今天">今天</button><button type="button" onclick="shiftViewDate(1)" title="后一天">›</button><button type="button" id="dayNoteChip" class="day-note-chip" onclick="setDayNote()" title="当天备注">✏</button></div>
+      <div id="lateTag" class="late-tag" hidden>补</div>
+      <!-- 进度环 -->
+      <div class="ring-card">
+        <div class="deco1"></div>
+        <div class="ring-wrap" id="ringWrap"></div>
+        <div class="ring-info">
+          <div class="ri-t" id="ringTitle">今日进度</div>
+          <div class="ring-todo" id="ringTodo"></div>
+          <button type="button" class="ring-expand" id="ringExpand" onclick="toggleRingDetails()" aria-expanded="false">查看全部习惯</button>
+          <div class="ri-tags" id="ringTags"></div>
+        </div>
+        <textarea class="ring-motto" id="ringMotto" rows="1" maxlength="160" placeholder="写一句座右铭" oninput="saveMotto(this.value)" aria-label="座右铭"></textarea>
+              </div>
+
+      <!-- 打卡列表 -->
+      <div class="sec-title"><span class="st-em"><svg fill="none" height="18" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="18" style="display:block"><path d="M20 6.5 9.2 17.3 4 12.1"/></svg></span><h3 data-i18n="today_checkin">今日打卡</h3><span class="sec-actions"><button type="button" class="sec-act sec-act-primary" onclick="openAdd()" data-i18n="habit_new">新建</button><button type="button" class="sec-act sec-act-txt" onclick="openHabitManager()" title="编辑 / 归档 / 恢复 / 彻底删除" data-i18n="habit_mgr">管理</button></span></div>
+      <div class="habit-filter-wrap">
+        <div class="habit-filter" id="habitFilters" role="group" aria-label="习惯筛选">
+          <button type="button" data-filter="all" aria-pressed="true"><span data-i18n="habit_filter_all">全部</span><span class="filter-count" id="habitFilterCountAll">0</span></button>
+          <button type="button" data-filter="pending" aria-pressed="false"><span data-i18n="habit_filter_pending">待完成</span><span class="filter-count" id="habitFilterCountPending">0</span></button>
+          <button type="button" data-filter="done" aria-pressed="false"><span data-i18n="habit_filter_done">已完成</span><span class="filter-count" id="habitFilterCountDone">0</span></button>
+        </div>
+        <span id="habitFilterStatus" class="ui-sr-only" role="status" aria-live="polite"></span>
+      </div>
+      <div id="checkinList"></div>
+
+      <!-- 心情随记 -->
+      <div class="sec-title"><span class="st-em"><svg fill="none" height="18" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="18" style="display:block"><path d="M12 3a9 9 0 1 0 0 18c1 0 1.6-.8 1.6-1.6 0-.5-.2-.9-.5-1.2-.3-.3-.5-.7-.5-1.2 0-.9.7-1.6 1.6-1.6H16a5 5 0 0 0 5-5c0-3.9-4-6.4-9-6.4z"/><circle cx="7.5" cy="11.5" fill="currentColor" r="1.1" stroke="none"/><circle cx="12" cy="8" fill="currentColor" r="1.1" stroke="none"/><circle cx="16.5" cy="11.5" fill="currentColor" r="1.1" stroke="none"/></svg></span><h3 data-i18n="today_mood">今日心情</h3></div>
+      <div class="card">
+        <div class="mood-row" id="moodRow"></div>
+        <div class="mood-bubble" id="moodBubble"></div>
+        <div class="mood-trail" id="moodTrail"></div>
+      </div>
+
+      <!-- 备忘录（今日随记） -->
+      <div class="sec-title"><span class="st-em"><svg fill="none" height="18" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="18" style="display:block"><path d="M5 4.5A1.5 1.5 0 0 1 6.5 3h8L19 7.5v12A1.5 1.5 0 0 1 17.5 21h-11A1.5 1.5 0 0 1 5 19.5z"/><path d="M14 3v5h5M8.5 12.5h7M8.5 16h4.5"/></svg></span><h3 data-i18n="memo_title">便签</h3><span class="mn-count" id="memoCountBadge"></span><button type="button" class="st-add" onclick="newNote()" title="新建便签"><span class="plus">＋</span> 新建</button></div>
+      <div class="card">
+        <div class="memo-box" id="memoBox">
+          <div class="memo-tools" id="memoTools">
+            <button type="button" class="mt-btn" data-cmd="undo" title="撤销 (Ctrl+Z)" aria-label="撤销">
+              <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14L4 9l5-5"/><path d="M4 9h11a5 5 0 0 1 5 5v0a5 5 0 0 1-5 5h-4"/></svg>
+            </button>
+            <button type="button" class="mt-btn" data-cmd="redo" title="重做 (Ctrl+Y)" aria-label="重做">
+              <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 14l5-5-5-5"/><path d="M20 9H9a5 5 0 0 0-5 5v0a5 5 0 0 0 5 5h4"/></svg>
+            </button>
+            <span class="mt-sep"></span>
+            <button type="button" class="mt-btn" data-cmd="bold" title="加粗" aria-label="加粗"><span class="b">B</span></button>
+            <button type="button" class="mt-btn" data-cmd="italic" title="斜体" aria-label="斜体"><span class="i">I</span></button>
+            <button type="button" class="mt-btn" data-cmd="underline" title="下划线" aria-label="下划线"><span class="u">U</span></button>
+            <button type="button" class="mt-btn" data-cmd="strikeThrough" title="删除线" aria-label="删除线"><span class="s">S</span></button>
+            <span class="mt-sep"></span>
+            <button type="button" class="mt-btn mt-sz" data-cmd="size" data-v="2" title="小字号" aria-label="小字号">A-</button>
+            <button type="button" class="mt-btn mt-sz" data-cmd="size" data-v="4" title="大字号" aria-label="大字号">A+</button>
+            <span class="mt-sep"></span>
+            <button type="button" class="mt-btn" data-cmd="color" data-v="#E5484D" title="红" aria-label="文字红色" style="color:#E5484D"><span class="i">A</span></button>
+            <button type="button" class="mt-btn" data-cmd="color" data-v="#3B5BDB" title="蓝" aria-label="文字蓝色" style="color:#3B5BDB"><span class="i">A</span></button>
+            <button type="button" class="mt-btn" data-cmd="color" data-v="#12A150" title="绿" aria-label="文字绿色" style="color:#12A150"><span class="i">A</span></button>
+            <button type="button" class="mt-btn" data-cmd="color" data-v="#111111" title="黑" aria-label="文字黑色" style="color:#111"><span class="i">A</span></button>
+            <span class="mt-brk"></span>
+            <button type="button" class="mt-btn" data-cmd="align" data-v="left" title="左对齐" aria-label="左对齐"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 5h16M4 9h10M4 13h16M4 17h10"/></svg></button>
+            <button type="button" class="mt-btn" data-cmd="align" data-v="center" title="居中" aria-label="居中"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 5h16M8 9h8M4 13h16M8 17h8"/></svg></button>
+            <button type="button" class="mt-btn" data-cmd="align" data-v="right" title="右对齐" aria-label="右对齐"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 5h16M10 9h10M4 13h16M10 17h10"/></svg></button>
+            <span class="mt-sep"></span>
+            <button type="button" class="mt-btn" id="mtImgBtn" data-cmd="image" title="插入图片" aria-label="插入图片">
+              <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>
+            </button>
+            <span class="mt-sep"></span>
+            <button type="button" class="mt-btn" data-cmd="ul" title="无序列表" aria-label="无序列表" style="font-size:18px;font-weight:800;line-height:1">•</button>
+            <button type="button" class="mt-btn" data-cmd="ol" title="有序列表" aria-label="有序列表" style="font-size:11px;font-weight:800;line-height:1">1.</button>
+            <button type="button" class="mt-btn" data-cmd="todo" title="待办事项（点击 ☐ 打勾）" aria-label="插入待办" style="font-size:13px;font-weight:800;line-height:1">☑</button>
+            <span class="mt-sep"></span>
+            <button type="button" class="mt-btn" data-cmd="hilite" data-v="#FFF59D" title="高亮" aria-label="高亮" style="background:#FFF59D;color:#5D4037;border-radius:6px">A</button>
+            <button type="button" class="mt-btn" data-cmd="hilite" data-v="#A5D6A7" title="绿底高亮" aria-label="绿底高亮" style="background:#A5D6A7;color:#1B5E20;border-radius:6px">A</button>
+            <button type="button" class="mt-btn" data-cmd="hilite" data-v="#90CAF9" title="蓝底高亮" aria-label="蓝底高亮" style="background:#90CAF9;color:#0D47A1;border-radius:6px">A</button>
+            <span class="mt-sep"></span>
+            <button type="button" class="mt-btn" data-cmd="clear" title="清除格式" aria-label="清除格式">
+              <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6h12v2H6zM9 6V4h6v2M8 8l.8 10a2 2 0 0 0 2 1.9h2.4a2 2 0 0 0 2-1.9L16 8"/></svg>
+            </button>
+          </div>
+          <div id="memoInput" class="memo-edit" contenteditable="true" data-ph="随手记一笔：今天的心情、待办、灵感…（支持粘贴图片）" oninput="saveMemoHtml(true)"></div>
+          <input type="file" id="memoFile" accept="image/*" style="display:none">
+          <div class="memo-bar">
+            <span class="memo-save-status" id="memoSaveStatus" title="保存状态"><i class="memo-save-light"></i></span>
+            <span class="mc" id="memoCount">0 字</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 便签页：历史记录列表（卡片流） -->
+    <div class="page memo-page" id="page-memo"><div class="memo-search-wrap"><input id="memoSearch" type="search" placeholder="搜索便签" aria-label="搜索便签" aria-controls="memoList" oninput="memoSearchDebounced(event)" oncompositionstart="this.dataset.composing='1'" oncompositionend="this.dataset.composing='0';memoSearchDebounced(event)"></div><div class="memo-list" id="memoList" aria-live="polite"></div></div>
+
+    <!-- 待办页：快速添加 + 分组列表（3.1.0）。列表由 js/todo.js 渲染 -->
+    <div class="page todo-page" id="page-todo"><div class="todo-page-heading"><h2 id="todoPageTitle">待办</h2></div><div class="todo-add-wrap"><input id="todoInput" type="text" placeholder="添加待办，回车确认" aria-label="添加待办" maxlength="500" onkeydown="todoInputKey(event)"><button type="button" class="todo-add-btn" onclick="openTodoEditor()" aria-label="新建待办：详细编辑" title="详细编辑（优先级 / 截止日 / 子任务）"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg><span id="todoDetailLabel">新建</span></button></div><div class="todo-list" id="todoList" aria-live="polite"></div></div>
+
+    <!-- 便签编辑页：全窗独立页（与锁定页同形态）。顶栏（返回/关闭/新建）与底部工具栏
+         均为悬浮层，默认隐藏，鼠标靠近上/下边缘时同步浮现（见 CSS chrome-on 与 JS mousemove）。
+         memo-box 由 moveMemoToPage() 从上方备忘录卡片移入。 -->
+    <div id="memoEditor" class="memo-editor">
+      <div class="me-dragstrip" title="拖动窗口"></div>
+      <!-- 今日进度卡视图（贴纸形态之二） -->
+      <div class="sticky-today" id="stickyToday" hidden></div>
+      <!-- 待办卡视图（贴纸形态之三，3.1.0）：js/todo.js renderStickyTodo 渲染 -->
+      <div class="sticky-todo" id="stickyTodo" hidden></div>
+      <div class="me-top">
+        <button type="button" class="me-btn me-back" onclick="openMemoList()" title="返回便签列表">‹ 返回</button>
+        <button type="button" class="me-btn me-pin" onclick="lockStickyNote()" title="把这条便签贴到桌面" aria-label="贴便签"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="10" r="3.2"/><path d="M12 21c4.5-4.2 7-7.5 7-11a7 7 0 1 0-14 0c0 3.5 2.5 6.8 7 11z"/></svg> 贴便签</button>
+        <input type="text" class="me-title" id="memoEdTitle" aria-label="便签标题" placeholder="未命名便签" maxlength="30" autocomplete="off" spellcheck="false">
+      </div>
+    </div>
+
+    <!-- ========== 我的习惯 ========== -->
+    <div class="hm-mask" id="habitManagerMask" onclick="closeHabitManager()"></div>
+    <div class="hm-panel" id="habitManager">
+      <div class="sec-title"><span class="st-em"><svg fill="none" height="18" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="18" style="display:block"><path d="M12 20v-8"/><path d="M12 12c0-3-2.2-5.2-5.5-5.2C6 10 8.2 12 12 12z"/><path d="M12 13c0-3.4 2.4-5.8 6-5.8-.2 3.8-2.6 5.8-6 5.8z"/></svg></span><h3 data-i18n="my_habits">我的习惯</h3><button class="st-add" onclick="openAdd()"><span class="plus">＋</span> <span data-i18n="add">添加</span></button></div>
+      <div class="hm-body">
+      <div id="habitList"></div>
+      <button class="add-habit-btn" onclick="openAdd()"><span style="font-size:20px">＋</span> <span data-i18n="add_new_habit">添加新习惯</span></button>
+      </div>
+    </div>
+
+    <!-- ========== 数据统计 ========== -->
+    <div class="page" id="page-stat">
+      <div class="sec-title"><span class="st-em"><svg fill="none" height="18" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="18" style="display:block"><path d="M4 20h16"/><rect height="6" rx="1" width="3" x="6" y="11"/><rect height="10" rx="1" width="3" x="11" y="7"/><rect height="4" rx="1" width="3" x="16" y="13"/></svg></span><h3 data-i18n="stat_overview">数据概览</h3></div>
+      <div class="stat-grid" id="statGrid"></div>
+      <div class="trend-card" id="trendCard"></div>
+
+      <div class="sec-title"><span class="st-em"><svg fill="none" height="18" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="18" style="display:block"><path d="M12 3c.5 3-1.8 4.2-2.8 5.8C8 10.6 8 12 8 12.6a4 4 0 1 0 8 0c0-2.2-1.4-3.4-1.4-5C13.3 6.2 13.6 4.4 12 3z"/></svg></span><h3 data-i18n="heat_title">30 天热力图</h3></div>
+      <div class="card">
+        <div class="heat-scroll"><div class="heat-wrap" id="heatWrap"></div></div>
+        <div class="heat-legend"><span>少</span><i style="background:var(--heat-0)"></i><i style="background:var(--heat-1)"></i><i style="background:var(--heat-2)"></i><i style="background:var(--heat-3)"></i><span>多</span></div>
+      </div>
+
+      <div class="sec-title"><span class="st-em"><svg fill="none" height="18" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="18" style="display:block"><path d="M3 17l5-5 3.5 3.5L20 7"/><path d="M15 7h5v5"/></svg></span><h3 data-i18n="week_title">本周完成情况</h3></div>
+      <div class="card"><div id="weekChart"></div></div>
+
+      <div class="sec-title"><span class="st-em"><svg fill="none" height="18" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="18" style="display:block"><path d="M8 15a4.5 4.5 0 1 1 3.3-7.6A4 4 0 0 1 18 10a3.5 3.5 0 0 1-.5 7H8z"/><circle cx="6" cy="19" r="1.3"/></svg></span><h3 data-i18n="mood_title">本月心情曲线</h3></div>
+      <div class="card"><div id="moodChart"></div></div>
+
+      <div class="sec-title"><span class="st-em"><svg fill="none" height="18" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="18" style="display:block"><path d="M7 4h10v3a5 5 0 0 1-10 0z"/><path d="M7 5H4.5a2.5 2.5 0 0 0 3 2.4"/><path d="M17 5h2.5a2.5 2.5 0 0 1-3 2.4"/><path d="M12 12v3"/><path d="M9 19h6"/><path d="M10 15h4l.5 4h-5z"/></svg></span><h3 data-i18n="badge_title">成就徽章</h3></div>
+      <div class="badge-grid" id="badgeGrid"></div>
+    </div>
+
+    <!-- ========== 我的 ========== -->
+    <div class="page" id="page-mine">
+      <div class="profile">
+        <div class="p-top"><div class="p-ava" id="pAva" onclick="openProfile()">☕</div><div class="p-name" id="pName">用户</div></div>
+        <div class="p-stats">
+          <div class="p-stat"><b id="psDays">0</b><span data-i18n="p_days">累计打卡天</span></div>
+          <div class="p-stat"><b id="psStreak">0</b><span data-i18n="p_streak">最长连续天数</span></div>
+          <div class="p-stat"><b id="psHabit">0</b><span data-i18n="p_habits">习惯数</span></div>
+        </div>
+      </div>
+
+      <div class="sec-title"><span class="st-em"><svg fill="none" height="18" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="18" style="display:block"><circle cx="12" cy="12" r="3"/><path d="M12 3v2.5M12 18.5V21M4.2 7.5l2.1 1.2M17.7 15.3l2.1 1.2M4.2 16.5l2.1-1.2M17.7 8.7l2.1-1.2"/></svg></span><h3 data-i18n="settings">设置</h3></div>
+      <div class="menu-card">
+        <div class="menu-item" id="themeRow">
+          <div class="mi-ico" style="background:var(--accent-t);color:var(--accent-d)"><svg fill="none" height="20" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="20" style="display:block"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></div>
+          <div class="mi-txt"><label class="mi-t" for="themeSelect" data-i18n="theme_title">主题</label><div class="mi-s" id="themeSub" data-i18n="theme_desc">选择应用外观</div></div>
+          <select class="theme-select" id="themeSelect" aria-describedby="themeSub" onchange="setThemeMode(this.value)">
+            <option value="light" data-i18n="theme_option_light">浅色</option>
+            <option value="dark" data-i18n="theme_option_dark">深色</option>
+            <option value="system" data-i18n="theme_option_system">跟随系统</option>
+          </select>
+        </div>
+        <div class="menu-item">
+          <div class="mi-ico" style="background:var(--accent-t);color:var(--accent-d)" id="startupIcon"></div>
+          <div class="mi-txt"><div class="mi-t" id="startupLabel">开机自启</div><div class="mi-s" id="startupSub">登录 Windows 时自动启动时迹</div></div>
+          <button type="button" class="mi-toggle" id="tgStartup" role="switch" aria-checked="false" aria-labelledby="startupLabel" onclick="toggleStartup(this)" disabled style="border:0;padding:0;flex-shrink:0;cursor:pointer"></button>
+        </div>
+        
+        
+        <div class="menu-item">
+          <div class="mi-ico" style="background:var(--accent-t);color:var(--accent-d)"><svg fill="none" height="20" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="20" style="display:block"><path d="M12 17v5"/><path d="M9 10.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24V16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V7a1 1 0 0 1 1-1 2 2 0 0 0 0-4H8a2 2 0 0 0 0 4 1 1 0 0 1 1 1z"/></svg></div>
+          <div class="mi-txt"><div class="mi-t" id="restoreLabel">启动贴回便签</div><div class="mi-s">下次启动自动把上次的便签（今日卡则贴当日）贴到桌面</div></div>
+          <div class="mi-toggle" id="tgRestore" role="switch" aria-checked="false" aria-labelledby="restoreLabel" tabindex="0" onclick="toggleRestore(this)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click();}"></div>
+        </div>
+        <div class="menu-item">
+          <div class="mi-ico" style="background:var(--accent-t);color:var(--accent-d)"><svg fill="none" height="20" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="20" style="display:block"><path d="M6 16.5V11a6 6 0 0 1 12 0v5.5l1.5 2H4.5z"/><path d="M9.5 18.5a2.5 2.5 0 0 0 5 0"/></svg></div>
+          <div class="mi-txt"><div class="mi-t" data-i18n="remind_per_title">单习惯到点提醒</div><div class="mi-s" data-i18n="remind_per_sub">到设定时间仍未打卡，发送系统通知</div></div>
+          <div class="mi-toggle on" id="tgRemindPer" role="switch" aria-checked="true" tabindex="0" onclick="toggleRemindPer(this)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click();}"></div>
+        </div>
+        <div class="menu-item">
+          <div class="mi-ico" style="background:var(--accent-t);color:var(--accent-d)"><svg fill="none" height="20" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="20" style="display:block"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></div>
+          <div class="mi-txt"><div class="mi-t" data-i18n="remind_sum_title">晚间汇总提醒</div><div class="mi-s" data-i18n="remind_sum_sub">晚 8 点后未完成的习惯闪烁并汇总通知</div></div>
+          <div class="mi-toggle on" id="tgRemindSum" role="switch" aria-checked="true" tabindex="0" onclick="toggleRemindSum(this)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click();}"></div>
+        </div>
+        <div class="menu-item">
+          <div class="mi-ico" style="background:var(--accent-t);color:var(--accent-d)"><svg fill="none" height="20" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="20" style="display:block"><path d="M4 6.5 6 8.5l4-4"/><rect height="13" rx="2" width="16" x="4" y="4.5"/><path d="M12 10h8M12 14h5"/></svg></div>
+          <div class="mi-txt"><div class="mi-t" data-i18n="remind_todo_title">待办到期提醒</div><div class="mi-s" data-i18n="remind_todo_sub">晚 8 点后仍有到期或逾期未完成的待办时汇总通知</div></div>
+          <div class="mi-toggle on" id="tgRemindTodo" role="switch" aria-checked="true" tabindex="0" onclick="toggleRemindTodo(this)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click();}"></div>
+        </div>
+        <div class="menu-item">
+          <div class="mi-ico" style="background:var(--accent-t);color:var(--accent-d)"><svg fill="none" height="20" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="20" style="display:block"><path d="M5 9v6h3.5L14 20V4L8.5 9z"/><path d="M17 8.5a4 4 0 0 1 0 7"/></svg></div>
+          <div class="mi-txt"><div class="mi-t" data-i18n="sound_title">打卡音效</div><div class="mi-s" data-i18n="sound_sub">完成打卡时播放提示音</div></div>
+          <div class="mi-toggle on" id="tgSound" role="switch" aria-checked="true" tabindex="0" onclick="toggleSound(this)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click();}"></div>
+        </div>
+        <div class="menu-item">
+          <div class="mi-ico" style="background:var(--accent-t);color:var(--accent-d)"><svg fill="none" height="20" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="20" style="display:block"><path d="M12 3l7 3v5c0 4.5-3 8.5-7 10-4-1.5-7-5.5-7-10V6z"/></svg></div>
+          <div class="mi-txt"><div class="mi-t" data-i18n="admin_title">管理员模式</div><div class="mi-s" data-i18n="admin_sub">关闭时：取消打卡/减进度/删归档/加奖励时长 需弹窗确认</div></div>
+          <div class="mi-toggle" id="tgAdmin" role="switch" aria-checked="false" tabindex="0" onclick="toggleAdmin(this)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click();}"></div>
+        </div>
+      </div>
+      
+      <div id="appBuildLine" style="text-align:center;color:var(--ink-mute,#97A0B4);font-size:11px;padding:16px 0 6px;letter-spacing:.2px;line-height:1.7">时迹</div>
+
+      <div class="sec-title"><span class="st-em"><svg fill="none" height="18" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="18" style="display:block"><path d="M5 4h11l3 3v13H5z"/><path d="M8 4v5h7V4"/><rect height="4" width="8" x="8" y="13"/></svg></span><h3 data-i18n="backup">数据管理</h3></div>
+      <div class="mi-s" id="backupState" style="margin:0 0 8px"></div>
+      <div class="menu-card">
+        <div class="menu-item" role="button" tabindex="0" onclick="backupNowManual()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click();}">
+          <div class="mi-ico" style="background:var(--accent-t);color:var(--accent-d)"><svg fill="none" height="20" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="20"><path d="M12 3v12"/><path d="m7 8 5-5 5 5"/><circle cx="12" cy="17" r="4"/><path d="m10.5 17 1 1 2-2"/></svg></div>
+          <div class="mi-txt"><div class="mi-t" data-i18n="backup_now">立即备份</div><div class="mi-s" data-i18n="backup_now_sub">马上写一份完整备份（含图片文件）</div></div>
+          <div class="mi-arrow">›</div>
+        </div>
+        <div class="menu-item" role="button" tabindex="0" onclick="cycleBackupCfg('interval')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click();}">
+          <div class="mi-ico" style="background:var(--accent-t);color:var(--accent-d)"><svg fill="none" height="20" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="20"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></div>
+          <div class="mi-txt"><div class="mi-t" data-i18n="backup_interval">自动备份频率</div><div class="mi-s" id="backupIntervalSub">每天 · 点击切换</div></div>
+          <div class="mi-arrow">›</div>
+        </div>
+        <div class="menu-item" role="button" tabindex="0" onclick="cycleBackupCfg('keep')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click();}">
+          <div class="mi-ico" style="background:var(--accent-t);color:var(--accent-d)"><svg fill="none" height="20" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="20"><path d="M4 7h16"/><path d="M5 7l1 13h12l1-13"/><path d="M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></div>
+          <div class="mi-txt"><div class="mi-t" data-i18n="backup_keep">备份保留份数</div><div class="mi-s" id="backupKeepSub">保留最近 7 份 · 点击切换</div></div>
+          <div class="mi-arrow">›</div>
+        </div>
+        <div class="menu-item" onclick="exportBackup()">
+          <div class="mi-ico" style="background:var(--accent-t); color:var(--accent-d)"><svg fill="none" height="20" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="20"><path d="M12 3v12"/><path d="m7 8 5-5 5 5"/><path d="M5 14v5a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-5"/></svg></div>
+          <div class="mi-txt"><div class="mi-t" data-i18n="export_title">导出备份</div><div class="mi-s" data-i18n="export_sub">保存为文件，换设备时搬过去</div></div>
+          <div class="mi-arrow">›</div>
+        </div>
+        <div class="menu-item" onclick="document.getElementById('backupFile').click()">
+          <div class="mi-ico" style="background:var(--accent-t);color:var(--accent-d)"><svg fill="none" height="20" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="20"><path d="M12 15V3"/><path d="m7 10 5 5 5-5"/><path d="M5 14v5a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-5"/></svg></div>
+          <div class="mi-txt"><div class="mi-t" data-i18n="import_title">导入备份</div><div class="mi-s" data-i18n="import_sub">从备份文件恢复数据</div></div>
+          <div class="mi-arrow">›</div>
+        </div>
+        <div class="menu-item" role="button" tabindex="0" onclick="moveDataDir()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click();}">
+          <div class="mi-ico" style="background:var(--accent-t);color:var(--accent-d)"><svg fill="none" height="20" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="20"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg></div>
+          <div class="mi-txt"><div class="mi-t" data-i18n="dir_title">数据目录</div><div class="mi-s" id="dataDirSub">迁移数据与备份到其他位置（如 D 盘）</div></div>
+          <div class="mi-arrow">›</div>
+        </div>
+        <div class="menu-item" role="button" tabindex="0" onclick="togglePortable()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click();}">
+          <div class="mi-ico" style="background:var(--accent-t);color:var(--accent-d)"><svg fill="none" height="20" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="20"><rect x="6" y="3" width="12" height="18" rx="2"/><path d="M10 18h4"/></svg></div>
+          <div class="mi-txt"><div class="mi-t" data-i18n="portable_title">便携模式</div><div class="mi-s" id="portableSub">数据跟随程序目录（绿色版）· 已关闭，点击开启</div></div>
+          <div class="mi-arrow">›</div>
+        </div>
+        <div class="menu-item" tabindex="0" role="button" onclick="adminGate(T('admin_gate_clear'),function(){clearSample();})" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click();}">
+          <div class="mi-ico" style="background:var(--rose-t);color:var(--rose)"><svg fill="none" height="20" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="20" style="display:block"><path d="M16 4l-6.5 6.5"/><path d="M9 10l5 5"/><path d="M7 13l4 4-5.5 3L4 18z"/></svg></div>
+          <div class="mi-txt"><div class="mi-t" data-i18n="clear_title">清空数据</div><div class="mi-s" id="clearSub">清空打卡记录，习惯列表和便签会保留</div></div>
+          <div class="mi-arrow">›</div>
+        </div>
+      </div>
+      <input type="file" id="backupFile" accept="application/json,.json" style="display:none">
+
+    </div>
+
+  </div>
+
+  <!-- 底部 Tab -->
+  <div class="tabbar">
+    <div class="tab on" data-tab="today" onclick="go('today')"><span class="ti"><svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24"><path d="M3 10.4 12 3l9 7.4"/><path d="M5 9.2V20a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V9.2"/></svg></span><span class="tl" data-i18n="tab_today">今日</span><span class="tdot"></span></div>
+    <div class="tab" data-tab="stat" onclick="go('stat')"><span class="ti"><svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24"><path d="M4 20V4"/><path d="M4 20h16"/><rect height="5" rx="1" width="3" x="7" y="12"/><rect height="9" rx="1" width="3" x="12" y="8"/><rect height="12" rx="1" width="3" x="17" y="5"/></svg></span><span class="tl" data-i18n="tab_stat">统计</span></div>
+    <div class="tab" data-tab="todo" onclick="go('todo')"><span class="ti"><svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24"><path d="M4 6.5 6 8.5l4-4"/><rect height="13" rx="2" width="16" x="4" y="4.5"/><path d="M12 10h8M12 14h5"/></svg></span><span class="tl" data-i18n="tab_todo">待办</span><span class="tdot" id="todoTabDot"></span></div>
+    <div class="tab" data-tab="memo" onclick="go('memo')"><span class="ti"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4.5A1.5 1.5 0 0 1 6.5 3h8L19 7.5v12A1.5 1.5 0 0 1 17.5 21h-11A1.5 1.5 0 0 1 5 19.5z"/><path d="M14 3v5h5M8.5 12.5h7M8.5 16h4.5"/></svg></span><span class="tl">便签</span></div>
+    <div class="tab" data-tab="mine" onclick="go('mine')"><span class="ti"><svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.6"/><path d="M4.5 20c0-3.9 3.4-6.4 7.5-6.4s7.5 2.5 7.5 6.4"/></svg></span><span class="tl" data-i18n="tab_mine">我的</span></div>
+  </div>
+
+</div>
+
+<!-- 弹层遮罩 -->
+<div class="sheet-mask" id="mask" onclick="closeSheet()"></div>
+
+<!-- 习惯编辑器 -->
+<div class="sheet" id="editorSheet">
+  <div class="sheet-bar"></div>
+  <div class="sheet-head">
+    <button type="button" class="sheet-back" onclick="backToHabits()" title="返回习惯列表" aria-label="返回习惯列表"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="m11 18-6-6 6-6"/></svg></button>
+    <h3 id="edTitle">添加习惯</h3>
+  </div>
+  <div class="sub" data-i18n="ed_sub">给自己定一个想坚持的小目标 🌿</div>
+  <div class="field">
+    <label data-i18n="f_name">习惯名称</label>
+    <input data-i18n-ph="ph_name" id="edName" maxlength="10" placeholder="如：早起、喝水、读书、冥想…" type="text" required aria-describedby="edNameError" oninput="clearHabitFieldError('edName')">
+    <div id="edNameError" class="field-error" role="alert" hidden></div>
+  <div id="edTemplates" style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px"></div>
+  </div>
+  <div class="field">
+    <label data-i18n="f_icon">选个图标</label>
+    <div class="opt-grid" id="edIcons"></div>
+  </div>
+  <div class="field">
+    <label data-i18n="f_type">打卡方式</label>
+    <div class="row2" id="edTypes"></div>
+  </div>
+    <div class="row2" id="edCountFields" style="display:none">
+    <div class="field"><label data-i18n="f_daily_target">每日目标</label><input id="edTarget" max="1000000" min="1" step="1" type="number" value="8" aria-describedby="edTargetError" oninput="clearHabitFieldError('edTarget')"><div id="edTargetError" class="field-error" role="alert" hidden></div></div>
+    <div class="field"><label data-i18n="f_unit">单位</label><input id="edUnit" maxlength="4" type="text" value="杯"></div>
+  </div>
+  <div class="field" id="edRangeField" style="display:none">
+    <label data-i18n="f_range_target">目标时长（小时，达到即完成）</label>
+    <input id="edRangeTarget" max="24" min="0.5" step="0.5" type="number" value="8" aria-describedby="edRangeError" oninput="clearHabitFieldError('edRangeTarget')">
+    <div id="edRangeError" class="field-error" role="alert" hidden></div>
+    <div data-i18n="range_hint" style="color:var(--ink-soft); font-size:11px; margin-top:6px">打卡时填开始/结束时间点，系统自动算时长（如 23:00 → 07:00 = 8 小时）</div>
+  </div>
+  <div class="field">
+    <label data-i18n="f_size">显示尺寸</label>
+    <div class="row2" id="edSizes"></div>
+  </div>
+  <div class="field" id="edScheduleField">
+    <label for="edScheduleMode">执行计划</label>
+    <select id="edScheduleMode" onchange="updateScheduleEditor()"><option value="daily">每天</option><option value="weekdays">指定星期</option><option value="weekly">每周完成 N 次</option></select>
+    <div class="field" id="edWeeklyField" hidden><label for="edWeeklyTimes">每周次数（周一至周日）</label><input id="edWeeklyTimes" type="number" min="1" max="7" step="1" value="3"></div>
+    <div id="edScheduleDays" class="schedule-days" hidden><label><input type="checkbox" value="1">周一</label><label><input type="checkbox" value="2">周二</label><label><input type="checkbox" value="3">周三</label><label><input type="checkbox" value="4">周四</label><label><input type="checkbox" value="5">周五</label><label><input type="checkbox" value="6">周六</label><label><input type="checkbox" value="0">周日</label></div>
+    <p class="planning-hint">新规则从今天生效；每周目标按完成的天数计，每天最多一次。</p>
+    <label class="planning-check"><input id="edPinned" type="checkbox">置顶这个习惯</label>
+  </div>
+  <div class="field"><label>独立提醒时间</label><input id="edRemindAt" type="time" value="20:00"><div style="color:var(--ink-soft);font-size:11px;margin-top:4px">留空表示不单独提醒（晚间汇总仍会提示）</div></div>
+  <div class="field"><label>提醒日期</label><select id="edRemindDays" onchange="edRemindDaysChanged()"><option value="all">每天</option><option value="weekdays">仅工作日</option><option value="weekends">仅周末</option><option value="custom">自定义星期</option></select></div>
+  <div class="field" id="edRemindCustom" style="display:none"><label>提醒星期</label><div id="edRemindWeek" style="display:flex;gap:6px;flex-wrap:wrap"></div></div>
+  <div class="field"><label data-i18n="rw_label">完成奖励</label>
+    <input id="edRewardText" type="text" maxlength="30" data-i18n-ph="rw_ph" placeholder="如：休息20分钟 / 刷抖音半小时" oninput="updateRewardPreview()">
+    <div class="row2" style="margin-top:8px">
+      <div class="field" style="margin:0"><label data-i18n="rw_min">奖励时长(分钟)</label><input id="edRewardMin" type="number" min="0" max="600" value="20" oninput="updateRewardPreview()"></div>
+      <div class="field" style="margin:0"><label data-i18n="rw_per">触发方式</label><select id="edRewardPer" onchange="updateRewardPreview()"><option value="check" data-i18n="rw_per_check">每次完成</option><option value="hour" data-i18n="rw_per_hour">每专注1小时</option></select></div>
+    </div>
+    <div id="rwPreview" class="rw-prev is-off"></div>
+    <div id="rwWarn" class="rw-warn" hidden></div>
+  </div>
+  <button class="btn-primary" data-i18n="save" onclick="saveHabit()">保存</button>
+  <button class="btn-ghost" data-i18n="del_habit" id="edDelBtn" onclick="delHabitFromEditor()" style="display:none">删除这个习惯</button><button type="button" class="btn-ghost" id="edArchiveBtn" onclick="toggleHabitArchive()" style="display:none">归档习惯</button>
+</div>
+
+<div class="sheet" id="backupHistorySheet"><div class="sheet-bar"></div><h3>备份历史与恢复</h3><p class="planning-hint">先预览记录差异，再确认恢复；当前数据会先备份。</p><div id="backupHistoryList" role="status"></div><button type="button" class="btn-ghost" onclick="closeSheet()">关闭</button></div>
+<div class="sheet" id="timeOffSheet"><div class="sheet-bar"></div><h3 id="timeOffTitle">暂停 / 请假</h3><div class="field"><label for="timeOffKind">方式</label><select id="timeOffKind" onchange="updateTimeOffKind()"><option value="leave">请假（指定结束日期）</option><option value="pause">暂停（手动恢复）</option></select></div><div class="field"><label for="timeOffFrom">开始日期</label><input id="timeOffFrom" type="date"></div><div class="field" id="timeOffToField"><label for="timeOffTo">结束日期（含当天）</label><input id="timeOffTo" type="date"></div><p class="planning-hint">这段时间不提醒、不计缺卡，也不会打断连续记录。已有打卡保留；归档用于结束整个计划。</p><button type="button" class="btn-primary" onclick="saveHabitTimeOff()">保存计划</button><button type="button" class="btn-ghost" onclick="closeSheet()">取消</button></div>
+<div class="sheet" id="timerRecoverySheet"><div class="sheet-bar"></div><h3>恢复上次专注</h3><p id="timerRecoveryText" class="planning-hint"></p><button type="button" class="btn-primary" onclick="resolveTimerRecovery('continue')">继续剩余时长</button><button type="button" class="btn-ghost" onclick="resolveTimerRecovery('settle')">结算已完成时长</button><button type="button" class="btn-ghost" onclick="resolveTimerRecovery('discard')">放弃本次</button></div>
+<!-- 昵称编辑器 -->
+<div class="sheet" id="profileSheet">
+  <div class="sheet-bar"></div>
+  <h3 data-i18n="profile_title">个人资料</h3>
+  <div class="sub" data-i18n="profile_sub">起个喜欢的名字、挑张头像吧 ✨</div>
+  <div class="field">
+    <label data-i18n="f_nick">昵称</label>
+    <input data-i18n-ph="ph_nick" id="pfName" maxlength="12" placeholder="给自己起个名字" type="text">
+  </div>
+  <div class="field">
+    <label data-i18n="f_ava_preview">头像预览</label>
+    <div style="align-items:center; display:flex; gap:14px">
+      <div id="pfPreview" style="align-items:center; background:linear-gradient(135deg,var(--accent),var(--accent-d)); background-position:center; background-size:cover; border:2px solid var(--line); border-radius:20px; display:flex; flex-shrink:0; font-size:32px; height:64px; justify-content:center; overflow:hidden; width:64px"></div>
+      <div style="display:flex; flex:1; flex-direction:column; gap:8px">
+        <button class="btn-mini-up" onclick="document.getElementById('avatarFile').click()"><svg fill="none" height="17" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="17" style="display:block"><rect height="13" rx="2.5" width="18" x="3" y="7"/><path d="M8.5 7l1.5-2.5h4L15.5 7"/><circle cx="12" cy="13.5" r="3.2"/></svg><span data-i18n="up_image">上传图片</span></button>
+        <div style="display:flex; gap:8px">
+          <input data-i18n-ph="ph_emoji" id="pfEmoji" maxlength="2" placeholder="或输入任意 emoji / 文字" type="text" style="background:#fff; border:2px solid var(--line); border-radius:11px; color:var(--ink); flex:1; font-family:inherit; font-size:15px; padding:10px 12px">
+          <button class="btn-mini-up" data-i18n="use_it" onclick="applyEmojiAvatar()" style="flex:0 0 auto; padding:0 14px">用它</button>
+        </div>
+      </div>
+    </div>
+    <input accept="image/*" id="avatarFile" onchange="uploadAvatar(event)" type="file" style="display:none">
+  </div>
+  <div class="field">
+    <label data-i18n="f_pick_ava">或从下面挑一个</label>
+    <div class="opt-grid" id="pfAvatars"></div>
+  </div>
+  <button class="btn-primary" data-i18n="save" onclick="saveProfile()">保存</button>
+</div>
+
+<!-- 时长习惯倒计时设置 -->
+<div class="sheet" id="timerSheet">
+  <div class="sheet-bar"></div>
+  <h3>设置专注时段</h3>
+  <div class="sub">完成本次专注后，时长会自动累计到今天</div>
+  <div class="field">
+    <label for="timerMinutesInput">本次时长（分钟）</label>
+    <input id="timerMinutesInput" type="number" min="1" max="180" step="1" inputmode="numeric" value="25">
+    <div class="timer-presets" aria-label="常用时长">
+      <button type="button" onclick="setTimerPreset(15)">15 分</button>
+      <button type="button" onclick="setTimerPreset(25)">25 分</button>
+      <button type="button" onclick="setTimerPreset(45)">45 分</button>
+      <button type="button" onclick="setTimerPreset(60)">60 分</button>
+    </div>
+  </div>
+  <button type="button" class="btn-primary" onclick="saveTimerSettings()">保存设置</button>
+  <button type="button" class="btn-ghost" onclick="closeSheet()">取消</button>
+</div>
+
+<!-- 专注计时：开始时弹出，收起不影响后台倒计时。 -->
+<div class="focus-overlay" id="focusOverlay" role="dialog" aria-modal="true" aria-labelledby="focusTitle">
+  <section class="focus-window">
+    <button type="button" class="focus-hide" onclick="hideFocusOverlay()" title="收起计时器" aria-label="收起计时器">
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+    </button>
+    <div class="focus-eyebrow">专注时间</div>
+    <h2 class="focus-title" id="focusTitle">准备专注</h2>
+    <div class="focus-clock" aria-live="polite">
+      <svg viewBox="0 0 260 260" aria-hidden="true"><circle class="focus-tick-ring" cx="130" cy="130" r="104"/><circle class="focus-track" cx="130" cy="130" r="107"/><circle class="focus-progress" id="focusProgress" cx="130" cy="130" r="107" stroke-dasharray="672.3" stroke-dashoffset="672.3"/></svg>
+      <div class="focus-clock-inner"><div class="focus-time" id="focusTime">25:00</div><div class="focus-state" id="focusState">即将开始</div></div>
+    </div>
+    <div class="focus-actions">
+      <button type="button" class="focus-action secondary" onclick="resetFocusTimer()" title="放弃本次专注" aria-label="放弃本次专注"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="7" width="10" height="10" rx="1"/></svg></button>
+      <button type="button" class="focus-action primary" id="focusPauseButton" onclick="toggleFocusPause()" title="暂停" aria-label="暂停"><svg id="focusPauseIcon" viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M7 5h3.5v14H7zM13.5 5H17v14h-3.5z"/></svg></button>
+    </div>
+    <p class="focus-tip" id="focusTip">完成后会自动计入今天的时长</p>
+  </section>
+</div>
+
+<!-- 备忘录图片裁剪：双击图片打开，所有处理均在本机 Canvas 内完成 -->
+<div class="crop-overlay" id="cropOverlay" role="dialog" aria-modal="true" aria-labelledby="cropTitle">
+  <div class="crop-dialog">
+    <div class="crop-head"><div><h3 id="cropTitle">裁剪图片</h3><span>拖动裁剪框，拖动四角调整范围</span></div></div>
+    <div class="crop-stage-wrap"><div class="crop-stage" id="cropStage"><img id="cropImage" alt="待裁剪图片"><div class="crop-shade"></div><div class="crop-selection" id="cropSelection"><i class="crop-handle" data-handle="nw"></i><i class="crop-handle" data-handle="ne"></i><i class="crop-handle" data-handle="sw"></i><i class="crop-handle" data-handle="se"></i></div></div></div>
+    <div class="crop-actions"><button type="button" class="crop-cancel" onclick="closeMemoCrop()">取消</button><button type="button" class="crop-save" onclick="applyMemoCrop()">裁剪并替换</button></div>
+  </div>
+</div>
+
+<div class="toast-wrap" id="toastWrap"></div>
+
+<!-- 待办编辑抽屉（3.1.0）：详细编辑优先级/截止日/子任务，由 js/todo.js 填充与保存 -->
+<div class="sheet" id="todoEditSheet"><div class="sheet-bar"></div><h3 id="todoEditTitle">编辑待办</h3>
+  <div class="field"><label for="todoEditText">内容</label><input id="todoEditText" type="text" maxlength="500" autocomplete="off" spellcheck="false"></div>
+  <div class="field"><label for="todoEditNote">备注</label><textarea id="todoEditNote" rows="2" maxlength="2000" spellcheck="false"></textarea></div>
+  <div class="field"><label id="todoPriLabel">优先级</label><div class="todo-pri-seg" id="todoEditPri" role="radiogroup" aria-labelledby="todoPriLabel">
+    <button type="button" data-p="0" onclick="todoPickPri(0)">无</button>
+    <button type="button" data-p="3" onclick="todoPickPri(3)">低</button>
+    <button type="button" data-p="2" onclick="todoPickPri(2)">中</button>
+    <button type="button" data-p="1" onclick="todoPickPri(1)">高</button>
+  </div></div>
+  <div class="field"><label for="todoEditDue">截止日期</label><input id="todoEditDue" type="date"></div>
+  <div class="field"><label id="todoSubLabel">子任务</label><div id="todoSubList" class="todo-sub-list"></div><button type="button" class="todo-sub-add" onclick="todoAddSubRow()">＋ 添加子任务</button></div>
+  <button type="button" class="btn-primary" onclick="saveTodoEditor()">保存</button>
+  <button type="button" class="btn-ghost" onclick="closeSheet()">取消</button>
+</div>
+
+<!-- 自定义确认弹层（替代原生 confirm：导入/清空/删除习惯等） -->
+<div class="confirm-mask" id="confirmMask" role="dialog" aria-modal="true" aria-labelledby="confirmTitle">
+  <div class="confirm-box">
+    <div class="confirm-title" id="confirmTitle"></div>
+    <div class="confirm-msg" id="confirmMsg"></div>
+    <div class="confirm-actions">
+      <button type="button" class="btn-ghost" id="confirmCancel">取消</button>
+      <button type="button" class="btn-primary" id="confirmOk">确定</button>
+    </div>
+  </div>
+</div>
+
+<script src="js/date-utils.js"></script>
+<script src="js/streak.js"></script>
+<script src="js/boot.js"></script>
+<script src="habit-rules.js"></script>
+<script src="js/data.js"></script>
+<script src="js/dialogs.js"></script>
+<script src="js/statistics.js"></script>
+<script src="js/timer.js"></script>
+<script src="js/render.js"></script>
+<script src="js/memo.js"></script>
+<script src="js/checkin.js"></script>
+<script src="js/banner.js"></script>
+<script src="js/reward.js"></script>
+<script src="js/nav.js"></script>
+<script src="js/planning.js"></script>
+<script src="js/recovery.js"></script>
+<script src="js/insights.js"></script>
+<script src="js/habit-edit.js"></script>
+<script src="js/theme.js"></script>
+<script src="js/settings.js"></script>
+<script src="js/data-admin.js"></script>
+<script src="js/todo.js"></script>
+<script src="js/keyboard.js"></script>
+<script src="js/sync.js"></script>
+<script src="js/init.js"></script>
+
+<!-- 锁定态四边拖拽热区（body 直接子级 + position:fixed，仅锁定显示；指针事件 + IPC 手动移动窗口） -->
+<div class="lock-edge edge-t"></div>
+<div class="lock-edge edge-b"></div>
+<div class="lock-edge edge-l"></div>
+<div class="lock-edge edge-r"></div>
+
+<div class="lock-corner corner-tl"></div>
+<div class="lock-corner corner-tr"></div>
+<div class="lock-corner corner-bl"></div>
+<div class="lock-corner corner-br"></div>
+<div class="resize-edge edge-l"></div>
+<div class="resize-edge edge-r"></div>
+<div class="resize-edge edge-b"></div>
+
+<script src="ui.js"></script>
+</body>
+</html>

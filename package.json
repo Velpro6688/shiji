@@ -1,0 +1,57 @@
+{
+  "name": "habit-lab",
+  "version": "1.0.0",
+  "description": "时迹",
+  "main": "main.js",
+  "productName": "时迹",
+  "scripts": {
+    "start": "electron .",
+    "lint": "eslint main.js preload.js store.js reminders.js startup-decide.js habit-rules.js backup-history.js ui.js js scripts --ext .js,.cjs",
+    "electron:install": "node node_modules/electron/install.js",
+    "predist": "npm run electron:install",
+    "dist": "npm run release:sync && electron-builder --win portable --config.directories.output=artifacts/portable-staging-1.0.0",
+    "release:sync": "node scripts/release-sync.cjs",
+    "release:prepare": "node scripts/prepare-release.cjs"
+  },
+  "build": {
+    "appId": "com.habitlab.desktop",
+    "asar": true,
+    "files": [
+      "main.js",
+      "preload.js",
+      "store.js",
+      "reminders.js",
+      "startup-decide.js",
+      "habit.html",
+      "ui.js",
+      "js/**/*",
+      "styles/**/*",
+      "logo.ico",
+      "logo-32.png",
+      "locales/**/*",
+      "habit-rules.js",
+      "backup-history.js"
+    ],
+    "extraResources": [
+      "desktop-layer.exe"
+    ],
+    "win": {
+      "icon": "logo.ico",
+      "target": [
+        "portable"
+      ],
+      "signExecutable": false
+    },
+    "portable": {
+      "artifactName": "时迹-便携版-1.0.0.exe"
+    }
+  },
+  "devDependencies": {
+    "electron": "44.7.2",
+    "electron-builder": "26.15.3",
+    "eslint": "^8.57.1"
+  },
+  "releaseDate": "2026-11-07",
+  "license": "MIT",
+  "author": "Velpro"
+}

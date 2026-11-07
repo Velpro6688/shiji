@@ -1,0 +1,25 @@
+# 依赖与构建产物
+node_modules/
+dist/
+dist-*/
+locales/
+artifacts/
+发布/
+安装包制作/payload/
+*.exe
+!/desktop-layer.exe
+*.log
+*.tmp
+*.exe.bak-*
+
+# 用户数据与本地配置
+/data/
+.env
+.env.*
+!.env.example
+.vscode/
+.workbuddy/
+.zcode/
+.finesse/
+.zcodeignore
+/AGENTS.md
