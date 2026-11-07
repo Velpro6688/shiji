@@ -1,6 +1,6 @@
 {
   "name": "habit-lab",
-  "version": "1.0.0",
+  "version": "1.1.0-beta.1",
   "description": "时迹",
   "main": "main.js",
   "productName": "时迹",
@@ -9,7 +9,7 @@
     "lint": "eslint main.js preload.js store.js reminders.js startup-decide.js habit-rules.js backup-history.js ui.js js scripts --ext .js,.cjs",
     "electron:install": "node node_modules/electron/install.js",
     "predist": "npm run electron:install",
-    "dist": "npm run release:sync && electron-builder --win portable --config.directories.output=artifacts/portable-staging-1.0.0",
+    "dist": "npm run release:sync && electron-builder --win portable --config.directories.output=artifacts/portable-staging-1.1.0-beta.1",
     "release:sync": "node scripts/release-sync.cjs",
     "release:prepare": "node scripts/prepare-release.cjs",
     "check": "node scripts/release-sync.cjs --check && node scripts/verify/check-inline-js.cjs habit.html main.js preload.js store.js reminders.js ui.js startup-decide.js habit-rules.js backup-history.js js",
@@ -27,7 +27,7 @@
     "verify:layout": "node scripts/verify/run-electron.cjs scripts/verify/verify-v231-layout.cjs",
     "verify:startup": "node scripts/verify/verify-startup-decide.cjs",
     "verify:performance": "node scripts/verify/run-electron.cjs scripts/verify/verify-ui-performance.cjs verify-ui-performance-after-result.json after",
-    "verify:packed-ui": "node scripts/verify/run-electron.cjs scripts/verify/verify-packed-ui.cjs verify-packed-ui-result.json artifacts/portable-staging-1.0.0/win-unpacked/resources/app.asar",
+    "verify:packed-ui": "node scripts/verify/run-electron.cjs scripts/verify/verify-packed-ui.cjs verify-packed-ui-result.json artifacts/portable-staging-1.1.0-beta.1/win-unpacked/resources/app.asar",
     "verify:transactions": "node scripts/verify/verify-store-transactions.cjs",
     "verify:quit": "node scripts/verify/verify-real-quit.cjs",
     "verify:audit": "node scripts/verify/run-electron.cjs scripts/verify/verify-audit-workflows.cjs",
@@ -96,7 +96,7 @@
       ]
     },
     "portable": {
-      "artifactName": "时迹-便携版-1.0.0.exe"
+      "artifactName": "时迹-便携版-1.1.0-beta.1.exe"
     },
     "mac": {
       "target": [

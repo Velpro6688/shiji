@@ -54,7 +54,7 @@ function hbPersistMemoImage(dataUrl,cb){
 }
 
 
-const APP_BUILD='2026-11-07-v1.0.0';
+const APP_BUILD='2026-11-07-v1.1.0-beta.1';
 var MAIN_BUILD=(function(){try{var m=(location.search||'').match(/[?&]build=([^&]+)/);return m?decodeURIComponent(m[1]):'';}catch(_){return '';}})();
 
 /* —— 矢量图标库（描边式，stroke:currentColor 自动跟随文字色/主题） —— */

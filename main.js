@@ -238,7 +238,7 @@ const DEF_W = 520;
 const DEF_H = 720;
 
 
-const APP_BUILD = '2026-11-07-v1.0.0';
+const APP_BUILD = '2026-11-07-v1.1.0-beta.1';
 
 /* —— 主进程数据层（v2.1 存储架构）——
    业务数据唯一落盘点：data.json + images/ + auto-backup/（详见 store.js 头注）。

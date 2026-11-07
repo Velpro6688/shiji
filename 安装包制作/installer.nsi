@@ -7,7 +7,7 @@ SetDatablockOptimize on
 
 !define APP_NAME      "时迹"
 !define APP_EXE       "时迹.exe"
-!define APP_VERSION   "1.0.0"
+!define APP_VERSION   "1.1.0-beta.1"
 !define APP_PUBLISHER "Velpro"
 !define UNINST_KEY    "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APP_NAME}"
 !define DATA_DIR      "$APPDATA\habit-lab"
