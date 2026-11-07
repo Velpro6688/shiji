@@ -4,7 +4,7 @@ permissions:
   contents: read
 jobs:
   verify:
-    if: github.ref != 'refs/heads/codex/macos-beta-dawn'
+    if: github.ref != 'refs/heads/codex/macos-beta-dawn' && !contains(github.ref, '-beta.')
     runs-on: windows-latest
     timeout-minutes: 40
     steps:
