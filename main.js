@@ -30,7 +30,7 @@ if (DEV_ENV_OK && process.env.HB_USERDATA) {
 
 // Windows 通知需要应用归属，否则页面里的 new Notification() 可能被系统静默丢弃
 // （设置里的「提醒」看似开着却从不弹）。ID 与 package.json 的 appId 保持一致。
-app.setAppUserModelId('com.habitlab.desktop');
+if (process.platform === 'win32') app.setAppUserModelId('com.habitlab.desktop');
 
 // hbimg:// 自定义协议：便签图片落盘文件（<数据根>/images/<id>.<ext>）的渲染通道。
  
@@ -285,7 +285,7 @@ async function flushWindowDrafts(freeze) {
 }
 const store = createStore({
   userDataDir: app.getPath('userData'),
-  portableAllowed: app.isPackaged || !!process.env.PORTABLE_EXECUTABLE_FILE || !!process.env.PORTABLE_EXECUTABLE_DIR,
+  portableAllowed: process.platform === 'win32' && (app.isPackaged || !!process.env.PORTABLE_EXECUTABLE_FILE || !!process.env.PORTABLE_EXECUTABLE_DIR),
   build: APP_BUILD,
   getAppVersion: () => { try { return require('./package.json').version || '2.1.0'; } catch (_) { return '2.1.0'; } },
   log,
@@ -570,7 +570,7 @@ if (!gotLock) {
   function createTray() {
     if (tray) return;
     // 托盘图标用项目内 logo.ico（多尺寸含 16/24/32/48/64/128/256，Windows 按 DPI 自动选最适）
-    let icon = nativeImage.createFromPath(path.join(__dirname, 'logo.ico'));
+    let icon = nativeImage.createFromPath(path.join(__dirname, process.platform === 'darwin' ? 'logo-32.png' : 'logo.ico'));
     if (icon.isEmpty()) {
       console.error('[tray] logo.ico 加载失败，改用 logo-32.png');
       icon = nativeImage.createFromPath(path.join(__dirname, 'logo-32.png'));
@@ -1254,6 +1254,11 @@ function guardNavigation(webContents) {
     } catch (_) { return ''; }
   }
   async function readStartupSettings() {
+    if (process.platform === 'darwin') {
+      if (!app.isPackaged) return { supported: false, enabled: false };
+      try { return { supported: true, enabled: !!app.getLoginItemSettings().openAtLogin }; }
+      catch (e) { log('[startup] read failed: ' + e.message); return { supported: false, enabled: false }; }
+    }
     if (process.platform !== 'win32') return { supported: false, enabled: false };
     const marker = await readStartupMarker();
     const inRegistry = await psAutostartExists();
@@ -1340,6 +1345,11 @@ function guardNavigation(webContents) {
   ipcMain.handle('hb-startup-set', async (event, enabled) => {
     if (!fromMainWindow(event)) { log('[hb-startup-set] 非主窗发送方，忽略'); return await readStartupSettings(); }
     if (typeof enabled !== 'boolean') throw new TypeError('Expected a boolean startup setting');
+    if (process.platform === 'darwin') {
+      if (!app.isPackaged) return await readStartupSettings();
+      app.setLoginItemSettings({ openAtLogin: enabled });
+      return await readStartupSettings();
+    }
     if (process.platform !== 'win32') return await readStartupSettings();
     if (enabled) {
       /* 写唯一事实来源（带引号，兼容含空格的安装路径） */

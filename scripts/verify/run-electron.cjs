@@ -4,7 +4,7 @@ const fs = require('fs');
 const path = require('path');
 
 const ROOT = path.resolve(__dirname, '..', '..');
-const ELECTRON = path.join(ROOT, 'node_modules', 'electron', 'dist', 'electron.exe');
+const ELECTRON = require('electron');
 const [, , scriptArg, reportArg, ...scriptArgs] = process.argv;
 
 if (!scriptArg) {

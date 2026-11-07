@@ -37,3 +37,26 @@ jobs:
         with:
           name: verification-results
           path: scripts/verify/results/
+
+  macos-build:
+    runs-on: macos-15
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - run: npm run electron:install
+      - run: npm run check
+      - run: npm run lint -- --max-warnings=0
+      - run: npm run verify:planning
+      - run: npm run verify:backup-history
+      - run: npm run verify:todo
+      - run: npm run verify:onboarding
+      - run: npm run dist:mac
+      - uses: actions/upload-artifact@v4
+        with:
+          name: macos-unsigned-test-build
+          path: artifacts/mac-build/*.zip

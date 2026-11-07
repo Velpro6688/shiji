@@ -62,7 +62,8 @@
     "verify:v313": "node scripts/verify/run-electron.cjs scripts/verify/verify-v313.cjs",
     "verify:corners": "node scripts/verify/run-electron.cjs scripts/verify/verify-continuous-corners.cjs",
     "verify:onboarding": "node scripts/verify/run-electron.cjs scripts/verify/verify-onboarding.cjs",
-    "preverify:all": "npm run electron:install"
+    "preverify:all": "npm run electron:install",
+    "dist:mac": "npm run electron:install && electron-builder --mac zip --config.directories.output=artifacts/mac-build"
   },
   "build": {
     "appId": "com.habitlab.desktop",
@@ -83,18 +84,26 @@
       "habit-rules.js",
       "backup-history.js"
     ],
-    "extraResources": [
-      "desktop-layer.exe"
-    ],
+    "extraResources": [],
     "win": {
       "icon": "logo.ico",
       "target": [
         "portable"
       ],
-      "signExecutable": false
+      "signExecutable": false,
+      "extraResources": [
+        "desktop-layer.exe"
+      ]
     },
     "portable": {
       "artifactName": "时迹-便携版-1.0.0.exe"
+    },
+    "mac": {
+      "target": [
+        "zip"
+      ],
+      "category": "public.app-category.productivity",
+      "identity": null
     }
   },
   "devDependencies": {
