@@ -1,5 +1,5 @@
 'use strict';
-const {app,BrowserWindow}=require('electron'),fs=require('fs'),path=require('path'),H=require('./_harness');
+const {app,BrowserWindow,screen}=require('electron'),fs=require('fs'),path=require('path'),H=require('./_harness');
 const suite=H.makeSuite('verify-window-stability');H.globalKillSwitch(suite.name,suite);
 const profile=H.initProfile(suite.name);process.env.HB_USERDATA=profile;
 fs.writeFileSync(path.join(profile,'data.json'),JSON.stringify({meta:{version:2,guideDone:true},habits:[],days:{},memoNotes:[],memo:{},settings:{sound:false,theme:'light'},profile:{name:'Window Test'}}));
@@ -20,7 +20,10 @@ app.whenReady().then(async()=>{
   /* Start above the app minimum: the transparent Windows shell adds an 8px native
      frame floor, so testing inward shrinks from 360x520 reaches the OS floor before
      the requested delta and would test Chromium's frame, not opposite-edge logic. */
-  win.setBounds({x:100,y:40,width:640,height:720});await H.sleep(250);
+  const wa=screen.getPrimaryDisplay().workArea;
+  const testWidth=Math.min(640,wa.width-80),testHeight=Math.min(640,wa.height-80);
+  if(testWidth<400||testHeight<540)throw Error('Display work area too small for resize test: '+JSON.stringify(wa));
+  win.setBounds({x:wa.x+24,y:wa.y+24,width:testWidth,height:testHeight});await H.sleep(250);
   /* The main page exposes left/right/bottom edge handles. Top and corner
      directions belong to locked-sticker / editor windows and are covered by
      verify-window-boundaries against the current IPC implementation. */
