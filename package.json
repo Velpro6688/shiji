@@ -63,7 +63,7 @@
     "verify:corners": "node scripts/verify/run-electron.cjs scripts/verify/verify-continuous-corners.cjs",
     "verify:onboarding": "node scripts/verify/run-electron.cjs scripts/verify/verify-onboarding.cjs",
     "preverify:all": "npm run electron:install",
-    "dist:mac": "npm run electron:install && electron-builder --mac zip --config.directories.output=artifacts/mac-build"
+    "dist:mac": "npm run electron:install && electron-builder --mac zip --publish never --config.directories.output=artifacts/mac-build"
   },
   "build": {
     "appId": "com.habitlab.desktop",
@@ -103,7 +103,8 @@
         "zip"
       ],
       "category": "public.app-category.productivity",
-      "identity": null
+      "identity": null,
+      "icon": "logo.icns"
     }
   },
   "devDependencies": {
