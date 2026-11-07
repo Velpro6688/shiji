@@ -2,6 +2,8 @@
 
 Windows 本地习惯打卡、待办与桌面便签应用，基于 Electron，界面为中文。所有数据保存在本机，不联网、不上传。
 
+**Bug 反馈与功能建议：** [velpro6688@gmail.com](mailto:velpro6688@gmail.com) · [GitHub Issues](https://github.com/Velpro6688/shiji/issues/new/choose)
+
 ## 界面预览
 
 ![时迹今日页面预览，展示示例习惯和打卡进度](docs/images/today.png)
